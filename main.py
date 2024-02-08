@@ -40,6 +40,7 @@ def get_post(post_id: int):
 def get_post(keyword: str):
     posts = []
     for post in blog:
-        if keyword in blog[post]["keywords"]:
+        keywords = [w.lower() for w in blog[post]["keywords"]]
+        if keyword in keywords:
             posts.append(blog[post])
     return posts
