@@ -35,12 +35,17 @@ def about():
 def get_post(post_id: int):
     return blog[post_id]
 
-
-@app.get("/keyword/{keyword}")
-def get_post(keyword: str):
+# параметры
+@app.get("/query/")
+def get_post(keyword: str = None, author: str = None):
     posts = []
-    for post in blog:
-        keywords = [w.lower() for w in blog[post]["keywords"]]
-        if keyword in keywords:
-            posts.append(blog[post])
+    for post_id in blog:
+        if keyword:
+            keywords = [w.lower() for w in blog[post_id]["keywords"]]
+            if keyword in keywords:
+                posts.append(blog[post_id])
+        if author:
+            if author == blog[post_id]["author"]:
+                posts.append(blog[post_id])
+        
     return posts
