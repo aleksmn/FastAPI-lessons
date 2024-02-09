@@ -1,6 +1,14 @@
 from fastapi import FastAPI
+from typing import Optional
+from pydantic import BaseModel
 
 app = FastAPI()
+
+class Item(BaseModel):
+    title: str
+    author: str
+    keywords: Optional[list] = None
+
 
 blog = {
     1: {
@@ -49,3 +57,17 @@ def get_post(keyword: str = None, author: str = None):
                 posts.append(blog[post_id])
         
     return posts
+
+
+
+@app.post("/create-item/{item_id}")
+def create_item(item_id: int, item: Item):
+    if item_id in blog:
+        return {"Error": "Пост с таким ID уже существует"}
+    blog[item_id] = {
+        "title": item.title,
+        "author": item.author,
+        "keywords": item.keywords
+    }
+
+    return blog[item_id]
