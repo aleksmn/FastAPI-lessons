@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from typing import Optional
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -7,7 +6,7 @@ app = FastAPI()
 class Item(BaseModel):
     title: str
     author: str
-    keywords: Optional[list] = None
+    keywords: list | None = None
 
 
 blog = {
@@ -45,7 +44,7 @@ def get_post(post_id: int):
 
 # параметры
 @app.get("/query/")
-def get_post(keyword: str = None, author: str = None):
+def get_post(keyword: str | None = None, author: str | None = None):
     posts = []
     for post_id in blog:
         if keyword:
