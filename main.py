@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-class Item(BaseModel):
+class Post(BaseModel):
     title: str
     author: str
     keywords: list | None = None
@@ -27,7 +27,6 @@ blog = {
     },
 }
 
-
 @app.get("/")
 def home():
     return {"Data":"test"}
@@ -40,6 +39,8 @@ def about():
 
 @app.get("/post/{post_id}")
 def get_post(post_id: int):
+    if post_id not in blog:
+        return {"Error": "Пост с таким ID не существует"}
     return blog[post_id]
 
 # параметры
@@ -59,14 +60,31 @@ def get_post(keyword: str | None = None, author: str | None = None):
 
 
 
-@app.post("/create-item/{item_id}")
-def create_item(item_id: int, item: Item):
-    if item_id in blog:
+@app.post("/create-post/{post_id}")
+def create_post(post_id: int, post: Post):
+    if post_id in blog:
         return {"Error": "Пост с таким ID уже существует"}
-    blog[item_id] = {
-        "title": item.title,
-        "author": item.author,
-        "keywords": item.keywords
+    blog[post_id] = {
+        "title": post.title,
+        "author": post.author,
+        "keywords": post.keywords
     }
 
-    return blog[item_id]
+    return blog[post_id]
+
+
+@app.put("/update-post/{post_id}")
+def update_post(post_id: int, post: Post):
+    if post_id not in blog:
+        return {"Error": "Пост с таким ID не существует"}
+    blog[post_id].update(post)
+    return blog[post_id]
+
+@app.delete("/delete-post/{post_id}")
+def delete_post(post_id: int, post: Post):
+    if post_id not in blog:
+        return {"Error": "Пост с таким ID не существует"}
+    del blog[post_id]
+    return {"Success": "Пост успешно удален"}
+
+
