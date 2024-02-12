@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -39,9 +39,12 @@ def about():
 
 @app.get("/post/{post_id}")
 def get_post(post_id: int):
-    if post_id not in blog:
-        return {"Error": "Пост с таким ID не существует"}
-    return blog[post_id]
+    if post_id in blog:
+        return blog[post_id]
+    else:
+        raise HTTPException(status_code=404, detail="Пост не найден")
+
+    
 
 # параметры
 @app.get("/query/")
@@ -63,7 +66,7 @@ def get_post(keyword: str | None = None, author: str | None = None):
 @app.post("/create-post/{post_id}")
 def create_post(post_id: int, post: Post):
     if post_id in blog:
-        return {"Error": "Пост с таким ID уже существует"}
+        raise HTTPException(status_code=400, detail="Пост с таким ID уже существует")
     blog[post_id] = {
         "title": post.title,
         "author": post.author,
@@ -76,14 +79,14 @@ def create_post(post_id: int, post: Post):
 @app.put("/update-post/{post_id}")
 def update_post(post_id: int, post: Post):
     if post_id not in blog:
-        return {"Error": "Пост с таким ID не существует"}
+        raise HTTPException(status_code=404, detail="Пост не найден")
     blog[post_id].update(post)
     return blog[post_id]
 
 @app.delete("/delete-post/{post_id}")
 def delete_post(post_id: int, post: Post):
     if post_id not in blog:
-        return {"Error": "Пост с таким ID не существует"}
+        raise HTTPException(status_code=404, detail="Пост не найден")
     del blog[post_id]
     return {"Success": "Пост успешно удален"}
 
